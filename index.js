@@ -6,11 +6,12 @@ const nonce = require("nonce");
 const querystring = require("querystring");
 const request = require("request-promise");
 const cookie = require("cookie");
+const axios = require("axios");
 
 const apiKey = process.env.SHOPIFY_API_KEY;
 const apiSecret = process.env.SHOPIFY_API_SECRET;
 const scopes = "write_products";
-const forwardingAddress = "http://7cda1155abc7.ngrok.io";
+const forwardingAddress = "https://0e002bb5f641.ngrok.io";
 
 app.get("/shopify", (req, res) => {
   const shop = req.query.shop;
@@ -102,4 +103,26 @@ app.get("/shopify/callback", (req, res) => {
 
 app.listen(3000, () => {
   console.log("Listening to port 3000");
+});
+
+app.get("/shopify/get-inventory", async (req, res) => {
+  const url = process.env.SHOPIFY_STORE_URL;
+
+  try {
+    const add = await axios.get(
+      "https://" +
+        process.env.SHOPIFY_API_KEY +
+        ":" +
+        process.env.SHOPIFY_API_SECRET +
+        "@" +
+        url +
+        "@" +
+        "/admin/api/2020-07/products.json"
+    );
+
+    res.send(add);
+  } catch (error) {
+    res.send(error);
+    console.log(error);
+  }
 });
